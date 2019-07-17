@@ -594,7 +594,7 @@ export const bars = {
 	mouseout: {
 		strokeWidth: 0,
 		strokeWidthAccessible: 2,
-		strokeOpacity: 1
+		strokeOpacity: 0
 	},
 	default: {
 		strokeWidth: 2

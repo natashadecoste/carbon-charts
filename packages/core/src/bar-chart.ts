@@ -149,14 +149,16 @@ export class BarChart extends BaseAxisChart {
 					.enter()
 						.append("rect")
 						.classed("bar", true)
+						.classed("accessible", this.options.accessibility )
 						.attr("x", this.getBarX.bind(this))
 						.attr("y", d => this.y(Math.max(0, d.value)))
 						.attr("width", this.x1.bandwidth())
 						.attr("height", d => Math.abs(this.y(d.value) - this.y(0)))
 						.attr("fill", d => this.getFillColor(d.datasetLabel, d.label, d.value))
-						.attr("stroke", d => this.options.accessibility ? this.getStrokeColor(d.datasetLabel, d.label, d.value) : null)
-						.attr("stroke-width", Configuration.bars.default.strokeWidth)
-						.attr("stroke-opacity", d => this.options.accessibility ? 1 : 0);
+						.style("outline-color", d => this.options.accessibility ? this.getStrokeColor(d.datasetLabel, d.label, d.value) : null);
+						//.attr("stroke", d => this.options.accessibility ? this.getStrokeColor(d.datasetLabel, d.label, d.value) : null)
+						//.attr("stroke-width", Configuration.bars.default.strokeWidth)
+						//.attr("stroke-opacity", d => this.options.accessibility ? 1 : 0);
 
 		// Hide the overlay
 		this.chartOverlay.hide();
@@ -193,6 +195,7 @@ export class BarChart extends BaseAxisChart {
 			.data((d, index) => this.addLabelsToDataPoints(d, index))
 			.enter()
 			.append("rect")
+			.classed("accessible", this.options.accessibility )
 			.attr("class", "bar")
 			.attr("x", this.getBarX.bind(this))
 			.attr("y", d => this.y(Math.max(0, d.value)))
@@ -202,8 +205,9 @@ export class BarChart extends BaseAxisChart {
 			.transition(this.getFillTransition())
 			.attr("fill", d => this.getFillColor(d.datasetLabel, d.label, d.value))
 			.style("opacity", 1)
-			.attr("stroke", (d: any) => this.getStrokeColor(d.datasetLabel, d.label, d.value))
-			.attr("stroke-width", Configuration.bars.default.strokeWidth);
+			.style("outline-color", (d: any) => this.getStrokeColor(d.datasetLabel, d.label, d.value ));
+			//.attr("stroke", (d: any) => this.getStrokeColor(d.datasetLabel, d.label, d.value))
+			//.attr("stroke-width", Configuration.bars.default.strokeWidth);
 
 		addedBars.selectAll("rect.bar")
 			.data((d, index) => this.addLabelsToDataPoints(d, index))
@@ -218,8 +222,9 @@ export class BarChart extends BaseAxisChart {
 			.transition(this.getFillTransition())
 			.attr("fill", d => this.getFillColor(d.datasetLabel, d.label, d.value))
 			.style("opacity", 1)
-			.attr("stroke", (d: any) => this.getStrokeColor(d.datasetLabel, d.label, d.value))
-			.attr("stroke-width", Configuration.bars.default.strokeWidth);
+			.style("outline-color", (d: any) => this.getStrokeColor(d.datasetLabel, d.label, d.value ));
+			//.attr("stroke", (d: any) => this.getStrokeColor(d.datasetLabel, d.label, d.value))
+			//.attr("stroke-width", Configuration.bars.default.strokeWidth);
 
 		// Remove bar groups are no longer needed
 		g.exit()
@@ -265,7 +270,8 @@ export class BarChart extends BaseAxisChart {
 			.attr("width", this.x1.bandwidth())
 			.attr("height", d => Math.abs(this.y(d.value) - this.y(0)))
 			.attr("fill", d => this.getFillColor(d.datasetLabel, d.label, d.value))
-			.attr("stroke", d => this.options.accessibility ? this.getStrokeColor(d.datasetLabel, d.label, d.value) : null);
+			.style("outline-color", d => this.options.accessibility ? this.getStrokeColor(d.datasetLabel, d.label, d.value) : null );
+			//.attr("stroke", d => this.options.accessibility ? this.getStrokeColor(d.datasetLabel, d.label, d.value) : null);
 	}
 
 	resizeChart() {
@@ -294,6 +300,7 @@ export class BarChart extends BaseAxisChart {
 	}
 
 	addDataPointEventListener() {
+		console.log('here')
 		const self = this;
 		const { accessibility } = this.options;
 
@@ -301,10 +308,15 @@ export class BarChart extends BaseAxisChart {
 			.on("click", d => self.dispatchEvent("bar-onClick", d))
 			.on("mouseover", function(d) {
 				select(this)
-					.attr("stroke-width", Configuration.bars.mouseover.strokeWidth)
+					.classed("accessible", false)
+					// .attr("outline-width", Configuration.bars.mouseover.strokeWidth)
+					// .style("outline-width", Configuration.bars.mouseover.strokeWidth)
+					//.style("outline-color", d => self.options.accessibility ? self.getStrokeColor(this.datasetLabel, this.label, this.value) : null)
 					.attr("stroke", self.getStrokeColor(d.datasetLabel, d.label, d.value))
+					.attr("stroke-width", Configuration.bars.mouseover.strokeWidth)
 					.attr("stroke-opacity", Configuration.bars.mouseover.strokeOpacity);
 
+					console.log('here');
 				self.showTooltip(d, this);
 				self.reduceOpacity(this);
 			})
@@ -312,8 +324,8 @@ export class BarChart extends BaseAxisChart {
 			.on("mouseout", function(d) {
 				const { strokeWidth, strokeWidthAccessible } = Configuration.bars.mouseout;
 				select(this)
-					.attr("stroke-width", accessibility ? strokeWidthAccessible : strokeWidth)
-					.attr("stroke", accessibility ? self.getStrokeColor(d.datasetLabel, d.label, d.value) : "none")
+					.classed("accessible", self.options.accessibility)
+					.attr("stroke", "none")
 					.attr("stroke-opacity", Configuration.bars.mouseout.strokeOpacity);
 
 				self.hideTooltip();

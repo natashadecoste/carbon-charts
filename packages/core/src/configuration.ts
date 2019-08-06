@@ -520,7 +520,7 @@ export const charts = {
 	widthBreak: 600,
 	marginForLegendTop: 40,
 	title: {
-		marginBottom: 24
+		marginBottom: 18
 	},
 	magicRatio: 0.7,
 	magicMoreForY2Axis: 70,

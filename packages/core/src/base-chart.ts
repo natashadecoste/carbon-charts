@@ -360,6 +360,7 @@ export class BaseChart {
 					this.hideTooltip();
 
 					this.resizeChart();
+					this.drawTitle();
 				}
 			}
 		});
@@ -368,24 +369,51 @@ export class BaseChart {
 	}
 
 	/**
-	 * Draws title within the Chart's svg element.
+	 * Draws title within the Chart's svg element. If there is no chart title, it should
+	 * still create a margin along the top of the chart container.
 	 * @param title
 	 */
 	drawTitle() {
-		if (this.options.title) {
-			// to add the padding only once
-			if (this.svg.select("text.chart-title").empty()) {
-				const titleMargin = Configuration.charts.title.marginBottom;
-				const translateObj = Tools.getTranslationValues(this.innerWrap.node());
+		let titleMargin = Configuration.charts.title.marginBottom;
+		const translateObj = Tools.getTranslationValues(this.innerWrap.node());
 
-				// add padding for title, keep other translations
+		// if theres no title, we want to make sure the innerwrap is margin distance from the chart container top
+		const chartContainerTop = this.container.node().getBoundingClientRect().top;
+		const innerWrapTop = this.innerWrap.node().getBoundingClientRect().top;
+
+		const titleRef = Tools.appendOrSelect(this.svg, "text.chart-title");
+
+		const diff = Math.ceil(Math.abs(chartContainerTop - innerWrapTop));
+		// console.log(diff);
+
+		if (this.options.title) {
+		// 	// adds title or gets reference to title
+		// 	const titleRef = Tools.appendOrSelect(this.svg, "text.chart-title");
+			titleRef
+				.lower()
+				.text(this.options.title);
+
+		 	titleMargin += Math.ceil(titleRef.node().getBBox().height);
+
+			(diff < titleMargin) ? console.log(true) : console.log(false);
+		 	if (diff < titleMargin) {
+				// this.innerWrap
+				// .style("transform", `translate(${translateObj.tx},${translateObj.ty})`);
 				this.innerWrap
-				.attr("transform", `translate(${translateObj.tx}, ${+translateObj.ty + titleMargin})`);
+					.attr("transform", `translate(${translateObj.tx}, ${+translateObj.ty + titleMargin})`);
 			}
-			// adds title or gets reference to title
-			const titleRef = Tools.appendOrSelect(this.svg, "text.chart-title");
-			titleRef.text(this.options.title);
+
+		} else {
+
+			titleRef
+				.classed("no-title", true);
+		//  adjust padding on top (after resize or update) if its not where it should be
+			if (diff < titleMargin) {
+				this.innerWrap
+					.attr("transform", `translate(${translateObj.tx}, ${+translateObj.ty + titleMargin})`);
+			}
 		}
+
 	}
 
 	setClickableLegend() {

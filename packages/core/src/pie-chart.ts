@@ -338,7 +338,7 @@ export class PieChart extends BaseChart {
 				.attr("width", `${dimensionToUseForScale}px`)
 				.attr("height", `${dimensionToUseForScale}px`);
 		this.innerWrap
-			.style("transform", `translate(${radius}px,${radius}px)`);
+			.attr("transform", `translate(${radius},${radius})`);
 
 		// Resize the arc
 		this.arc = arc()

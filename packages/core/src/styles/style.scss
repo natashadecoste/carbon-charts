@@ -32,6 +32,9 @@ div.chart-holder {
 			font-weight: 600;
 			padding-bottom: 8px;
 			dominant-baseline: hanging;
+			&.no-title {
+				visibility: hidden;
+			}
 		}
 
 		/*

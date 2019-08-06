@@ -393,10 +393,10 @@ export class BaseChart {
 				.lower()
 				.text(this.options.title);
 
-		 	titleMargin += Math.ceil(titleRef.node().getBBox().height);
+			titleMargin += Math.ceil(titleRef.node().getBBox().height);
 
 			(diff < titleMargin) ? console.log(true) : console.log(false);
-		 	if (diff < titleMargin) {
+			if (diff < titleMargin) {
 				// this.innerWrap
 				// .style("transform", `translate(${translateObj.tx},${translateObj.ty})`);
 				this.innerWrap

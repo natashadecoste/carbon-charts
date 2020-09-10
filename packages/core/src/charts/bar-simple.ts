@@ -11,6 +11,7 @@ import {
 	SimpleBar,
 	TwoDimensionalAxes,
 	ZeroLine,
+	ChartClip,
 	// the imports below are needed because of typescript bug (error TS4029)
 	Tooltip,
 	Legend,
@@ -40,6 +41,7 @@ export class SimpleBarChart extends AxisChart {
 		const graphFrameComponents: any[] = [
 			new TwoDimensionalAxes(this.model, this.services),
 			new Grid(this.model, this.services),
+			new ChartClip(this.model, this.services),
 			new SimpleBar(this.model, this.services),
 			new ZeroLine(this.model, this.services),
 			new Skeleton(this.model, this.services, {

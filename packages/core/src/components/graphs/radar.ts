@@ -446,11 +446,18 @@ export class Radar extends Component {
 		const blobUpdate = blobs
 			.selectAll("path")
 			.data(this.groupedDataNormalized, (group) => group.name);
+
 		blobUpdate.join(
 			(enter) =>
 				enter
 					.append("path")
-					.attr("class", "blob")
+					.attr("class", (group) =>
+						this.model.getColorClassName(
+							["fill"],
+							group.name,
+							"blob"
+						)
+					)
 					.attr("role", Roles.GRAPHICS_SYMBOL)
 					.attr("opacity", 0)
 					.attr("transform", `translate(${c.x}, ${c.y})`)
@@ -514,7 +521,13 @@ export class Radar extends Component {
 				(update) => update,
 				(exit) => exit.remove()
 			)
-			.attr("class", (d) => Tools.kebabCase(d[angle]))
+			.attr("class", (d) =>
+				this.model.getColorClassName(
+					["fill"],
+					d[groupMapsTo],
+					Tools.kebabCase(d[angle])
+				)
+			)
 			.attr(
 				"cx",
 				(d) =>
@@ -825,7 +838,10 @@ export class Radar extends Component {
 						.map((datum) => ({
 							label: datum[groupMapsTo],
 							value: datum[valueMapsTo],
-							color: self.model.getStrokeColor(datum[groupMapsTo])
+							class: self.model.getColorClassName(
+								["tooltip"],
+								datum[groupMapsTo]
+							)
 						}))
 				});
 			})

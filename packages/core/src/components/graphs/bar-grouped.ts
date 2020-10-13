@@ -6,7 +6,6 @@ import { CartesianOrientations, Events, Roles } from "../../interfaces";
 // D3 Imports
 import { map } from "d3-collection";
 import { select } from "d3-selection";
-import { color } from "d3-color";
 import { ScaleBand, scaleBand } from "d3-scale";
 
 export class GroupedBar extends Bar {
@@ -107,6 +106,9 @@ export class GroupedBar extends Bar {
 					animate
 				)
 			)
+			.attr("class", (d) =>
+				this.model.getColorClassName(["fill"], d[groupMapsTo], "bar")
+			)
 			.attr("fill", (d) => this.model.getFillColor(d[groupMapsTo]))
 			.attr("d", (d) => {
 				/*
@@ -178,17 +180,11 @@ export class GroupedBar extends Bar {
 			.on("mouseover", function (datum) {
 				const hoveredElement = select(this);
 
-				hoveredElement
-					.transition(
-						self.services.transitions.getTransition(
-							"graph_element_mouseover_fill_update"
-						)
+				hoveredElement.transition(
+					self.services.transitions.getTransition(
+						"graph_element_mouseover_fill_update"
 					)
-					.attr("fill", (d: any) =>
-						color(self.model.getFillColor(d[groupMapsTo]))
-							.darker(0.7)
-							.toString()
-					);
+				);
 
 				// Dispatch mouse event
 				self.services.events.dispatchEvent(Events.Bar.BAR_MOUSEOVER, {
@@ -224,16 +220,11 @@ export class GroupedBar extends Bar {
 				const hoveredElement = select(this);
 				hoveredElement.classed("hovered", false);
 
-				const { groupMapsTo } = self.model.getOptions().data;
-				hoveredElement
-					.transition(
-						self.services.transitions.getTransition(
-							"graph_element_mouseout_fill_update"
-						)
+				hoveredElement.transition(
+					self.services.transitions.getTransition(
+						"graph_element_mouseout_fill_update"
 					)
-					.attr("fill", (d: any) =>
-						self.model.getFillColor(d[groupMapsTo])
-					);
+				);
 
 				// Dispatch mouse event
 				self.services.events.dispatchEvent(Events.Bar.BAR_MOUSEOUT, {

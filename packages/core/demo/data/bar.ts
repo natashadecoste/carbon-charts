@@ -90,6 +90,11 @@ export const simpleBarOptions = {
 			mapsTo: "group",
 			scaleType: "labels"
 		}
+	},
+	color: {
+		paring: {
+			index: 1
+		}
 	}
 };
 

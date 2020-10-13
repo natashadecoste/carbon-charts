@@ -39,7 +39,10 @@ export class Meter extends Component {
 		const value = svg.selectAll("rect.value").data([data]);
 
 		// if user provided a color for the bar, we dont want to attach a status class
-		const userProvidedScale = Tools.getProperty(options, "color", "scale");
+		const className =
+			status != null && !self.model.colorIsProvided()
+				? `value status--${status}`
+				: "";
 
 		// draw the value bar
 		value
@@ -50,11 +53,12 @@ export class Meter extends Component {
 			.attr("x", 0)
 			.attr("y", 0)
 			.attr("height", Tools.getProperty(options, "meter", "height"))
-			.attr(
-				"class",
-				status != null && !userProvidedScale
-					? `value status--${status}`
-					: ""
+			.attr("class", (d) =>
+				this.model.getColorClassName(
+					["fill"],
+					d[groupMapsTo],
+					className
+				)
 			)
 			.transition(
 				this.services.transitions.getTransition(

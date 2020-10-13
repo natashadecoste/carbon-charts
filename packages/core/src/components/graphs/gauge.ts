@@ -125,10 +125,16 @@ export class Gauge extends Component {
 		arcValue
 			.enter()
 			.append("path")
-			.attr("class", "arc-foreground")
+			.attr("class", (d) =>
+				this.model.getColorClassName(
+					["fill"],
+					d[groupMapsTo],
+					"arc-foreground"
+				)
+			)
+			.attr("fill", (d) => self.model.getFillColor(d[groupMapsTo]))
 			.merge(arcValue)
 			.attr("d", this.arc)
-			.attr("fill", (d) => self.model.getFillColor(d[groupMapsTo]))
 			// a11y
 			.attr("role", Roles.GRAPHICS_SYMBOL)
 			.attr("aria-roledescription", "value")

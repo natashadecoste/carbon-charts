@@ -1,7 +1,6 @@
 // Internal Imports
 import * as Configuration from "./configuration";
 import { Tools } from "./tools";
-import * as colorPalettes from "./services/colorPalettes";
 import { Events, ScaleTypes } from "./interfaces";
 
 // D3
@@ -34,6 +33,8 @@ export class ChartModel {
 
 	// Fill scales & fill related objects
 	protected colorScale: any = {};
+
+	protected colorClassNames: any = {};
 
 	constructor(services: any) {
 		this.services = services;
@@ -332,7 +333,8 @@ export class ChartModel {
 
 		this.updateAllDataGroups();
 
-		this.setColorScale();
+		this.setUserProvidedColorScale();
+		this.setColorClasses();
 		this.services.events.dispatchEvent(Events.Model.UPDATE, { animate });
 	}
 
@@ -431,8 +433,12 @@ export class ChartModel {
 	}
 
 	getFillColor(group: any, key?: any, data?: any) {
+		if (!this.colorIsProvided()) {
+			return null;
+		}
 		const options = this.getOptions();
 		const defaultFillColor = this.getFillScale()(group);
+
 		if (options.getFillColor) {
 			return options.getFillColor(group, key, data, defaultFillColor);
 		} else {
@@ -441,6 +447,10 @@ export class ChartModel {
 	}
 
 	getStrokeColor(group: any, key?: any, data?: any) {
+		if (!this.colorIsProvided()) {
+			return null;
+		}
+
 		const options = this.getOptions();
 		const defaultStrokeColor = this.colorScale(group);
 		if (options.getStrokeColor) {
@@ -452,6 +462,35 @@ export class ChartModel {
 
 	getFillScale() {
 		return this.colorScale;
+	}
+
+	colorIsProvided() {
+		const userProvidedScale = Tools.getProperty(
+			this.getOptions(),
+			"color",
+			"scale"
+		);
+
+		return (
+			userProvidedScale !== null &&
+			Object.keys(userProvidedScale).length > 0
+		);
+	}
+
+	getColorClassName(types: string[], group: any, originalClassName?: any) {
+		if (this.colorIsProvided()) {
+			return originalClassName;
+		}
+
+		const colorParingTag = this.colorClassNames(group);
+		let className = originalClassName;
+		types.forEach(
+			(type) =>
+				(className = originalClassName
+					? `${className} ${type}-${colorParingTag}`
+					: `${type}-${colorParingTag}`)
+		);
+		return className;
 	}
 
 	/**
@@ -584,47 +623,71 @@ export class ChartModel {
 	/*
 	 * Fill scales
 	 */
-	protected setColorScale() {
-		const defaultColors = colorPalettes.DEFAULT;
+	protected setUserProvidedColorScale() {
+		if (!this.colorIsProvided()) {
+			return;
+		}
 
 		const options = this.getOptions();
 		const userProvidedScale = Tools.getProperty(options, "color", "scale");
 
-		// If there is no valid user provided scale, use the default set of colors
-		if (
-			userProvidedScale === null ||
-			Object.keys(userProvidedScale).length === 0
-		) {
-			this.colorScale = scaleOrdinal()
-				.range(defaultColors)
-				.domain(this.allDataGroups);
-
-			return;
-		}
-
 		/**
 		 * Go through allDataGroups. If a data group has a color value provided
 		 * by the user, add that to the color range
-		 * If not, add a default color
 		 */
 		const colorRange = [];
-		let colorIndex = 0;
 		this.allDataGroups.forEach((dataGroup) => {
 			if (userProvidedScale[dataGroup]) {
 				colorRange.push(userProvidedScale[dataGroup]);
-			} else {
-				colorRange.push(defaultColors[colorIndex]);
-			}
-
-			if (colorIndex === defaultColors.length - 1) {
-				colorIndex = 0;
-			} else {
-				colorIndex++;
 			}
 		});
 
 		this.colorScale = scaleOrdinal()
 			.range(colorRange)
 			.domain(this.allDataGroups);
+	}
+
+	/*
+	 * Color palette
+	 */
+	protected setColorClasses() {
+		let paringIndex = Tools.getProperty(
+			this.getOptions(),
+			"color",
+			"paring",
+			"index"
+		);
+		const availableColorPairings = {
+			"1-color": 4,
+			"2-color": 5,
+			"3-color": 5,
+			"4-color": 3,
+			"5-color": 2,
+			"14-color": 1
+		};
+
+		// If number of dataGroups is greater than 5, user 14-color palette
+		const numberOfColors =
+			this.allDataGroups.length > 5 ? 14 : this.allDataGroups.length;
+		// Use default palette if user choice is not in range
+		paringIndex =
+			paringIndex <= availableColorPairings[`${numberOfColors}-color`]
+				? paringIndex
+				: 1;
+
+		// Create color classes for graph, tooltip and stroke use
+		const colorParing = this.allDataGroups.map(
+			(dataGroup, index) =>
+				`${numberOfColors}-${paringIndex}-${index + 1}`
+		);
+
+		// If there is no valid user provided scale, use the default set of colors
+		if (!this.colorIsProvided()) {
+			this.colorClassNames = scaleOrdinal()
+				.range(colorParing)
+				.domain(this.allDataGroups);
+
+			return;
+		}
 	}
 }

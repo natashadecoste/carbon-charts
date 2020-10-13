@@ -5,7 +5,6 @@ import { Tools } from "../../tools";
 
 // D3 Imports
 import { select } from "d3-selection";
-import { color } from "d3-color";
 
 export class SimpleBar extends Bar {
 	type = "simple-bar";
@@ -53,6 +52,9 @@ export class SimpleBar extends Bar {
 					"bar-update-enter",
 					animate
 				)
+			)
+			.attr("class", (d) =>
+				this.model.getColorClassName(["fill"], d[groupMapsTo], "bar")
 			)
 			.attr("fill", (d) => this.model.getFillColor(d[groupMapsTo]))
 			.attr("d", (d, i) => {
@@ -127,18 +129,11 @@ export class SimpleBar extends Bar {
 			.on("mouseover", function (datum) {
 				const hoveredElement = select(this);
 				hoveredElement.classed("hovered", true);
-				hoveredElement
-					.transition(
-						self.services.transitions.getTransition(
-							"graph_element_mouseover_fill_update"
-						)
+				hoveredElement.transition(
+					self.services.transitions.getTransition(
+						"graph_element_mouseover_fill_update"
 					)
-					.attr("fill", (d: any) =>
-						color(self.model.getFillColor(d[groupMapsTo]))
-							.darker(0.7)
-							.toString()
-					);
-
+				);
 				// Dispatch mouse event
 				self.services.events.dispatchEvent(Events.Bar.BAR_MOUSEOVER, {
 					element: hoveredElement,
@@ -172,15 +167,11 @@ export class SimpleBar extends Bar {
 				const hoveredElement = select(this);
 				hoveredElement.classed("hovered", false);
 
-				hoveredElement
-					.transition(
-						self.services.transitions.getTransition(
-							"graph_element_mouseout_fill_update"
-						)
+				hoveredElement.transition(
+					self.services.transitions.getTransition(
+						"graph_element_mouseout_fill_update"
 					)
-					.attr("fill", (d: any) =>
-						self.model.getFillColor(d[groupMapsTo])
-					);
+				);
 
 				// Dispatch mouse event
 				self.services.events.dispatchEvent(Events.Bar.BAR_MOUSEOUT, {

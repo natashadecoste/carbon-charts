@@ -64,6 +64,13 @@ export class Legend extends Component {
 			"numCharacter"
 		);
 
+		const paletteIndex = Tools.getProperty(
+			options,
+			"color",
+			"paring",
+			"index"
+		);
+
 		addedLegendItems
 			.append("rect")
 			.classed("checkbox", true)
@@ -80,8 +87,18 @@ export class Legend extends Component {
 			.attr("height", checkboxRadius * 2)
 			.attr("rx", 1)
 			.attr("ry", 1)
+			.attr("class", (d, i) => {
+				if (paletteIndex) {
+					return this.model.getColorClassName(
+						["fill"],
+						d.name,
+						"checkbox"
+					);
+				}
+			})
 			.style("fill", (d) => {
-				return d.status === Configuration.legend.items.status.ACTIVE
+				return d.status === Configuration.legend.items.status.ACTIVE &&
+					!paletteIndex
 					? this.model.getFillColor(d.name)
 					: null;
 			})

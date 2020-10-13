@@ -104,6 +104,16 @@ export interface BaseChartOptions {
 		 */
 		scale?: object;
 		/**
+		 * use a carbon dataviz preset color palette
+		 * put the index (selection of which variant)
+		 */
+		paring?: {
+			/**
+			 * the number of the preset
+			 */
+			index: number;
+		};
+		/*
 		 * options related to gradient
 		 * e.g. { enabled: true }
 		 */

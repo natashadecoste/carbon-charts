@@ -12,6 +12,7 @@ import {
 	DonutChartOptions,
 	BubbleChartOptions,
 	RadarChartOptions,
+	ComboChartOptions,
 	// Components
 	GridOptions,
 	RulerOptions,
@@ -363,6 +364,11 @@ const radarChart: RadarChartOptions = Tools.merge({}, chart, {
 	}
 } as RadarChartOptions);
 
+/**
+ * options specific to combo charts
+*/
+const comboChart: ComboChartOptions = baseBarChart;
+
 export const options = {
 	chart,
 	axisChart,
@@ -378,7 +384,8 @@ export const options = {
 	donutChart,
 	meterChart,
 	radarChart,
-	gaugeChart
+	gaugeChart,
+	comboChart
 };
 
 export * from "./configuration-non-customizable";

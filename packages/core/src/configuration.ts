@@ -154,7 +154,8 @@ const chart: BaseChartOptions = {
 	},
 	color: {
 		scale: null,
-		paring: {
+		pairing: {
+			numberOfGroups: null,
 			index: 1
 		},
 		gradient: {

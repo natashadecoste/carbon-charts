@@ -92,8 +92,27 @@ export const simpleBarOptions = {
 		}
 	},
 	color: {
-		paring: {
+		pairing: {
 			index: 1
+		}
+	}
+};
+
+export const simpleBarColorPaletteOptions = {
+	title: "Simple bar (color palette)",
+	axes: {
+		left: {
+			mapsTo: "value"
+		},
+		bottom: {
+			scaleType: "labels",
+			mapsTo: "group"
+		}
+	},
+	color: {
+		pairing: {
+			numberOfGroups: 7,
+			index: 2
 		}
 	}
 };

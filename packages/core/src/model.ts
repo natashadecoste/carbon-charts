@@ -334,7 +334,7 @@ export class ChartModel {
 		this.updateAllDataGroups();
 
 		this.setUserProvidedColorScale();
-		this.setColorClasses();
+		this.setColorClassNames();
 		this.services.events.dispatchEvent(Events.Model.UPDATE, { animate });
 	}
 
@@ -482,13 +482,13 @@ export class ChartModel {
 			return originalClassName;
 		}
 
-		const colorParingTag = this.colorClassNames(group);
+		const colorPairingTag = this.colorClassNames(group);
 		let className = originalClassName;
 		types.forEach(
 			(type) =>
 				(className = originalClassName
-					? `${className} ${type}-${colorParingTag}`
-					: `${type}-${colorParingTag}`)
+					? `${className} ${type}-${colorPairingTag}`
+					: `${type}-${colorPairingTag}`)
 		);
 		return className;
 	}
@@ -650,13 +650,20 @@ export class ChartModel {
 	/*
 	 * Color palette
 	 */
-	protected setColorClasses() {
-		let paringIndex = Tools.getProperty(
+	protected setColorClassNames() {
+		const colorPairingOptions = Tools.getProperty(
 			this.getOptions(),
 			"color",
-			"paring",
-			"index"
+			"pairing"
 		);
+
+		// Check if user has defined numberOfGroups (differ from given data)
+		let numberOfGroups = Tools.getProperty(colorPairingOptions, "numberOfGroups");
+		if (!numberOfGroups || numberOfGroups < this.allDataGroups.length) {
+			numberOfGroups = this.allDataGroups.length;
+		}
+
+		let pairingIndex = Tools.getProperty(colorPairingOptions,"index");
 		const availableColorPairings = {
 			"1-color": 4,
 			"2-color": 5,
@@ -667,24 +674,24 @@ export class ChartModel {
 		};
 
 		// If number of dataGroups is greater than 5, user 14-color palette
-		const numberOfColors =
-			this.allDataGroups.length > 5 ? 14 : this.allDataGroups.length;
+		const numberOfColors = numberOfGroups > 5 ? 14 : numberOfGroups;
+
 		// Use default palette if user choice is not in range
-		paringIndex =
-			paringIndex <= availableColorPairings[`${numberOfColors}-color`]
-				? paringIndex
+		pairingIndex =
+			pairingIndex <= availableColorPairings[`${numberOfColors}-color`]
+				? pairingIndex
 				: 1;
 
 		// Create color classes for graph, tooltip and stroke use
-		const colorParing = this.allDataGroups.map(
+		const colorPairing = this.allDataGroups.map(
 			(dataGroup, index) =>
-				`${numberOfColors}-${paringIndex}-${index + 1}`
+				`${numberOfColors}-${pairingIndex}-${index % 14 + 1}`
 		);
 
 		// If there is no valid user provided scale, use the default set of colors
 		if (!this.colorIsProvided()) {
 			this.colorClassNames = scaleOrdinal()
-				.range(colorParing)
+				.range(colorPairing)
 				.domain(this.allDataGroups);
 
 			return;

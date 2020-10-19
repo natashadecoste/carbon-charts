@@ -107,11 +107,15 @@ export interface BaseChartOptions {
 		 * use a carbon dataviz preset color palette
 		 * put the index (selection of which variant)
 		 */
-		paring?: {
+		pairing?: {
+			/**
+			 * the number of data groups/categories, only if differ from given data
+			 */
+			numberOfGroups?: number;
 			/**
 			 * the number of the preset
 			 */
-			index: number;
+			index?: number;
 		};
 		/*
 		 * options related to gradient
